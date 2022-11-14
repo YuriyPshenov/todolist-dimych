@@ -21,32 +21,25 @@ type TodolistPropsType = {
 export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha to learn'}, tasks: [...]}, props - это объект
 
     // Local state
-    const [title, setTitle] = useState('')
-    const [error, setError] = useState<string | null>(null)
+    let [title, setTitle] = useState('')
+    let [error, setError] = useState<boolean>(false)
 
     // Function
     const onChangeTitle = (event: ChangeEvent<HTMLInputElement>) => {
         setTitle(event.currentTarget.value)
+        setError(false)
     }
 
-    const onKeyDownEnterPress = (event: KeyboardEvent<HTMLInputElement>) => {
-        setError(null)
-        if (event.key === 'Enter') {
-            props.addTask(title)
-            setTitle('')
-        }
-    }
+    const onKeyDownEnterPress = (event: KeyboardEvent<HTMLInputElement>) => event.key === 'Enter' && onClickAddTask()
 
     const onClickAddTask = () => {
-        if (title.trim() === '') {
-            setTitle('')
-            setError('Field is required')
-            return;
+        const trimmedTitle = title.trim()
+        if(trimmedTitle) {
+            props.addTask(trimmedTitle)
         } else {
-            props.addTask(title.trim())
-            setTitle('')
-            setError(null)
+            setError(true)
         }
+        setTitle('')
     }
 
     //filter tasks functions
@@ -66,7 +59,7 @@ export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha
             <div>
                 <input className={errorStyle} value={title} onChange={onChangeTitle} onKeyDown={onKeyDownEnterPress}/>
                 <button onClick={onClickAddTask}>+</button>
-                {error && <div className={s.errorMessage}>{error}</div>}
+                {error && <div className={s.errorMessage}>Недоступное имя таски</div>}
             </div>
             <ul>
                 {

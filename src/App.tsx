@@ -8,14 +8,14 @@ export type FilterValuesType = 'all' | 'completed' | 'active'
 
 const App = () => {
 
-    let[tasks, setTasks] = useState<Array<TasksType>>([
+    const[tasks, setTasks] = useState<Array<TasksType>>([
         {id: v1(), title: 'CSS&HTML', isDone: true},
         {id: v1(), title: 'JS', isDone: true},
         {id: v1(), title: 'REACT', isDone: false},
         {id: v1(), title: 'REDUX', isDone: false},
     ])
 
-    let[filter, setFilter] = useState<FilterValuesType>('all')
+    const[filter, setFilter] = useState<FilterValuesType>('all')
 
     const removeTask = (idTask: string) => {
         setTasks(tasks.filter((t) => t.id !== idTask))

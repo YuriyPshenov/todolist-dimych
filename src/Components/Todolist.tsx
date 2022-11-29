@@ -3,6 +3,8 @@ import {FilterValuesType} from "../App";
 import s from "./Todolist.module.css";
 import {AddItemForm} from "./AddItemForm";
 import {EditableSpan} from "./EditableSpan";
+import {Button, Checkbox, IconButton} from "@mui/material";
+import {Delete} from "@mui/icons-material";
 
 export type TasksType = {
     id: string
@@ -40,9 +42,9 @@ export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha
     const onClickCompletedFilter = () => props.changeFilter('completed', props.id)
 
     //Styles
-    const allFilterButton = props.filter === 'all' ? s.activeFilter : ''
-    const activeFilterButton = props.filter === 'active' ? s.activeFilter : ''
-    const completedFilterButton = props.filter === 'completed' ? s.activeFilter : ''
+    const allFilterButton = props.filter === 'all' ? 'contained' : 'text'
+    const activeFilterButton = props.filter === 'active' ? 'contained' : 'text'
+    const completedFilterButton = props.filter === 'completed' ? 'contained' : 'text'
     const onChangeTitleTodolist = (newTitle: string) => props.changeTodolistTitle(props.id, newTitle)
 
     return (
@@ -50,11 +52,12 @@ export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha
             <div>
                 <h3>
                     <EditableSpan title={props.title} onChange={onChangeTitleTodolist}/>
-                    <button onClick={deleteTodolist}>x</button>
+                    <IconButton onClick={deleteTodolist}>
+                        <Delete />
+                    </IconButton>
                 </h3>
             </div>
             <AddItemForm addItem={addTask}/>
-            <ul>
                 {
                     props.tasks.map((t) => {
                             //help function
@@ -63,22 +66,23 @@ export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha
                             const onChangeTitleStatusHandler = (newValue: string) => props.changeTaskTitle(t.id, newValue, props.id)
                             const isDoneStyle = t.isDone ? s.isDone : ''
 
-                        
+
                             return (
-                                <li key={t.id} className={isDoneStyle}>
-                                        <input type={'checkbox'} checked={t.isDone} onChange={taskStatus}/>
+                                <div key={t.id} className={isDoneStyle}>
+                                        <Checkbox checked={t.isDone} onChange={taskStatus}/>
                                         <EditableSpan title={t.title} onChange={onChangeTitleStatusHandler}/>
-                                        <button onClick={removeTask}>x</button>
-                                </li>
+                                        <IconButton onClick={removeTask}>
+                                            <Delete />
+                                        </IconButton>
+                                </div>
                             )
                         }
                     )
                 }
-            </ul>
             <div>
-                <button className={allFilterButton} onClick={onClickAllFilter}>All</button>
-                <button className={activeFilterButton} onClick={onClickActiveFilter}>Active</button>
-                <button className={completedFilterButton} onClick={onClickCompletedFilter}>Completed</button>
+                <Button variant={allFilterButton} onClick={onClickAllFilter}>All</Button>
+                <Button color={'success'} variant={activeFilterButton} className={activeFilterButton} onClick={onClickActiveFilter}>Active</Button>
+                <Button color={'secondary'} variant={completedFilterButton} onClick={onClickCompletedFilter}>Completed</Button>
             </div>
         </div>
     )

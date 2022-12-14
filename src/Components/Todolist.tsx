@@ -5,6 +5,9 @@ import {AddItemForm} from "./AddItemForm";
 import {EditableSpan} from "./EditableSpan";
 import {Button, Checkbox, IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
+import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "../state/TasksReducer";
+import {useDispatch, useSelector} from "react-redux";
+import {AppRootState} from "../state/store";
 
 export type TasksType = {
     id: string
@@ -15,25 +18,34 @@ export type TasksType = {
 type TodolistPropsType = {
     id: string
     title: string
-    tasks: Array<TasksType>
-    removeTask: (idTask: string, todolistId: string) => void
     changeFilter: (value: FilterValuesType, todolistId: string) => void
-    addTask: (inputValue: string, todolistId: string) => void
-    changeStatusTask: (idTask: string, isDone: boolean, todolistId: string) => void
     filter: FilterValuesType
     removeTodolist: (todolistId: string) => void
-    changeTaskTitle: (id: string, newTitle: string, todolistId: string) => void
     changeTodolistTitle: (id: string, newTitle: string) => void
 } // описываем какой должен быть объект
 
 export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha to learn'}, tasks: [...]}, props - это объект
 
+    const dispatch = useDispatch()
+    const tasks = useSelector<AppRootState, TasksType[]>(state => state.tasks[props.id])
+
+    const addTask = (inputValue: string) => {
+        dispatch(addTaskAC(inputValue, props.id))
+    }
+
+    let allTodolistTasks = tasks
+    let tasksForTodolist = allTodolistTasks
+
+    if (props.filter === 'completed') {
+        tasksForTodolist = allTodolistTasks.filter((t) => t.isDone)
+    }
+    if (props.filter === 'active') {
+        tasksForTodolist = allTodolistTasks.filter((t) => !t.isDone)
+    }
+
     // Function
     const deleteTodolist = () => {
         props.removeTodolist(props.id)
-    }
-    const addTask = (title: string) => {
-        props.addTask(title, props.id)
     }
 
     //filter tasks functions
@@ -59,19 +71,18 @@ export const Todolist = (props: TodolistPropsType) => { // props = {title: {'Wha
             </div>
             <AddItemForm addItem={addTask}/>
                 {
-                    props.tasks.map((t) => {
+                    tasksForTodolist.map((t) => {
                             //help function
-                            const removeTask = () => props.removeTask(t.id, props.id)
-                            const taskStatus = (event: ChangeEvent<HTMLInputElement>) => props.changeStatusTask(t.id, event.currentTarget.checked, props.id)
-                            const onChangeTitleStatusHandler = (newValue: string) => props.changeTaskTitle(t.id, newValue, props.id)
+                            const removeTaskHandler = () => dispatch(removeTaskAC(t.id, props.id))
+                            const taskStatus = (event: ChangeEvent<HTMLInputElement>) => dispatch(changeTaskStatusAC(t.id, event.currentTarget.checked, props.id))
+                            const onChangeTitleStatusHandler = (newValue: string) => dispatch(changeTaskTitleAC(t.id, newValue, props.id))
                             const isDoneStyle = t.isDone ? s.isDone : ''
-
 
                             return (
                                 <div key={t.id} className={isDoneStyle}>
                                         <Checkbox checked={t.isDone} onChange={taskStatus}/>
                                         <EditableSpan title={t.title} onChange={onChangeTitleStatusHandler}/>
-                                        <IconButton onClick={removeTask}>
+                                        <IconButton onClick={removeTaskHandler}>
                                             <Delete />
                                         </IconButton>
                                 </div>
